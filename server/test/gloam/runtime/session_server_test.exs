@@ -62,6 +62,20 @@ defmodule Gloam.Runtime.SessionServerTest do
     assert Enum.map(persisted, & &1.type) == [:session_started, :calendar_advanced]
   end
 
+  test "resumes persisted NPC movement from tick events" do
+    storage_path = tmp_path()
+    {:ok, first_pid} = start_session(storage_path, "session-1")
+
+    assert {:ok, events} = SessionServer.tick(first_pid, 720)
+    assert Enum.map(events, & &1.type) == [:calendar_advanced, :npc_moved, :npc_moved]
+    assert SessionServer.snapshot(first_pid).npcs["mara"].location_id == "tavern"
+    assert :ok = stop_session(first_pid)
+
+    {:ok, resumed_pid} = start_session(storage_path, "session-1")
+
+    assert SessionServer.snapshot(resumed_pid).npcs["mara"].location_id == "tavern"
+  end
+
   test "automatic ticks are opt-in and persist through the same event path" do
     storage_path = tmp_path()
 

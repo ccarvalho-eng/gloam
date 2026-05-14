@@ -41,6 +41,9 @@ Server messages:
 Command decoding uses an explicit allowlist for command types and sources. It
 does not convert arbitrary strings into atoms.
 
+Snapshots include calendar, player, and NPC state. NPCs are returned as a stable
+list ordered by ID, with location, disposition, schedule, and memory fields.
+
 ## Tick Events
 
 Scheduled ticks and `wait` commands both emit `calendar_advanced` events. Engine
@@ -57,6 +60,8 @@ Host engines can also advance session time explicitly:
 
 The tick endpoint requires the same session bearer token and `command:write`
 scope as command submission. Accepted ticks return `calendar_advanced` events.
+If an NPC schedule changes location for the new time band, the same response may
+also include `npc_moved` events.
 
 ## Error
 

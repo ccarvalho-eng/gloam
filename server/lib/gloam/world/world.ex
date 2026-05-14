@@ -3,13 +3,13 @@ defmodule Gloam.World.World do
   Static world content plus current calendar state.
   """
 
-  alias Gloam.World.Calendar
+  alias Gloam.World.{Calendar, NPC}
 
   @type t :: %__MODULE__{
           id: String.t(),
           calendar: Calendar.t(),
           locations: %{String.t() => struct()},
-          npcs: map(),
+          npcs: %{String.t() => NPC.t()},
           factions: map(),
           quests: map(),
           flags: MapSet.t(atom())

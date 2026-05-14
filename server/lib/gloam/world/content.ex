@@ -3,7 +3,7 @@ defmodule Gloam.World.Content do
   Built-in content used by examples and smoke tests.
   """
 
-  alias Gloam.World.{Calendar, Location, Player, World}
+  alias Gloam.World.{Calendar, Location, NPC, Player, World}
 
   @spec living_village() :: %{world: World.t(), player: Player.t()}
   def living_village do
@@ -11,7 +11,8 @@ defmodule Gloam.World.Content do
       world: %World{
         id: "living_village",
         calendar: living_village_calendar(),
-        locations: living_village_locations()
+        locations: living_village_locations(),
+        npcs: living_village_npcs()
       },
       player: %Player{id: "player", location_id: "village_square"}
     }
@@ -64,6 +65,36 @@ defmodule Gloam.World.Content do
         exits: ["old_well"],
         tags: [:road, :outdoors]
       }
+    ]
+    |> Map.new(&{&1.id, &1})
+  end
+
+  defp living_village_npcs do
+    [
+      NPC.new!(%{
+        id: "mara",
+        name: "Mara",
+        location_id: "blacksmith",
+        disposition: :focused,
+        schedule: %{
+          morning: "blacksmith",
+          day: "blacksmith",
+          evening: "tavern",
+          night: "tavern"
+        }
+      }),
+      NPC.new!(%{
+        id: "owen",
+        name: "Owen",
+        location_id: "old_well",
+        disposition: :curious,
+        schedule: %{
+          morning: "old_well",
+          day: "village_square",
+          evening: "tavern",
+          night: "old_well"
+        }
+      })
     ]
     |> Map.new(&{&1.id, &1})
   end

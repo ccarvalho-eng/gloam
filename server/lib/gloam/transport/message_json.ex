@@ -4,7 +4,7 @@ defmodule Gloam.Transport.MessageJSON do
   """
 
   alias Gloam.Events.Event
-  alias Gloam.World.{Calendar, Player}
+  alias Gloam.World.{Calendar, NPC, Player}
 
   @spec snapshot(map()) :: map()
   def snapshot(snapshot) when is_map(snapshot) do
@@ -14,6 +14,7 @@ defmodule Gloam.Transport.MessageJSON do
       "world_id" => snapshot.world_id,
       "calendar" => calendar(snapshot.calendar),
       "player" => player(snapshot.player),
+      "npcs" => npcs(snapshot.npcs),
       "event_count" => snapshot.event_count
     }
   end
@@ -57,7 +58,26 @@ defmodule Gloam.Transport.MessageJSON do
     }
   end
 
+  defp npcs(npcs) when is_map(npcs) do
+    npcs
+    |> Map.values()
+    |> Enum.sort_by(& &1.id)
+    |> Enum.map(&npc/1)
+  end
+
+  defp npc(%NPC{} = npc) do
+    %{
+      "id" => npc.id,
+      "name" => npc.name,
+      "location_id" => npc.location_id,
+      "disposition" => to_string(npc.disposition),
+      "schedule" => stringify_value(npc.schedule),
+      "memory" => stringify_value(npc.memory)
+    }
+  end
+
   defp stringify_value(%Calendar{} = value), do: calendar(value)
+  defp stringify_value(%NPC{} = value), do: npc(value)
 
   defp stringify_value(value) when is_map(value) do
     Map.new(value, fn {key, nested_value} -> {to_string(key), stringify_value(nested_value)} end)

@@ -5,7 +5,8 @@ V1 intentionally keeps RPG systems narrow.
 ## Included
 
 - Calendar and seasons.
-- NPC schedules.
+- NPC identity, location, disposition, memory, and schedules.
+- NPC movement proposals from Jido-backed time-band schedules.
 - NPC relationships.
 - Faction reputation.
 - Quest state.

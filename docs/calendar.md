@@ -43,6 +43,8 @@ engine frames, server schedules, or their own simulation loop.
 When enabled, scheduled ticks produce `calendar_advanced` events with
 `actor_id: "system"` and the world ID as the subject. The event payload contains
 the updated calendar, changed facts, and the number of in-world minutes advanced.
+Ticks may also emit `npc_moved` events when a scheduled NPC changes location for
+the new time band.
 
 Environment variables:
 

@@ -2,6 +2,7 @@ defmodule Gloam.Runtime.SessionTest do
   use ExUnit.Case, async: true
 
   alias Gloam.Commands.Command
+  alias Gloam.Events.Event
   alias Gloam.Runtime.Session
   alias Gloam.World.Content
 
@@ -116,5 +117,41 @@ defmodule Gloam.Runtime.SessionTest do
 
     assert {:error, error, ^session, []} = Session.tick(session, 0)
     assert error.code == :invalid_tick_duration
+  end
+
+  test "tick returns structured errors when NPC schedule planning fails" do
+    content = Content.living_village()
+    invalid_content = %{content | world: %{content.world | npcs: :invalid}}
+    {:ok, session, _events} = Session.start(invalid_content, session_id: "session-1")
+
+    assert {:error, error, ^session, []} = Session.tick(session, 15)
+    assert error.code == :npc_schedule_planning_failed
+  end
+
+  test "tick moves scheduled NPCs through replayable events" do
+    {:ok, session, _events} = Session.start(Content.living_village(), session_id: "session-1")
+
+    assert Session.snapshot(session).npcs["mara"].location_id == "blacksmith"
+    assert {:ok, updated, events} = Session.tick(session, 720)
+
+    assert Enum.map(events, & &1.type) == [:calendar_advanced, :npc_moved, :npc_moved]
+    assert Session.snapshot(updated).calendar.time_band == :evening
+    assert Session.snapshot(updated).npcs["mara"].location_id == "tavern"
+  end
+
+  test "replay restores NPC movement events even if static content changed" do
+    content = Content.living_village()
+    {:ok, session, _events} = Session.start(content, session_id: "session-1")
+    {:ok, moved, events} = Session.tick(session, 720)
+    npc_moved = Enum.find(events, &(&1.type == :npc_moved and &1.subject_id == "mara"))
+
+    content_without_mara = %{
+      content
+      | world: %{content.world | npcs: Map.delete(content.world.npcs, "mara")}
+    }
+
+    assert {:ok, replayed} = Session.replay(content_without_mara, "session-1", moved.events)
+    assert Session.snapshot(replayed).npcs["mara"].location_id == "tavern"
+    assert %Event{} = npc_moved
   end
 end

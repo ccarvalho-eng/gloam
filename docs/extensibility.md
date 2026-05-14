@@ -48,6 +48,11 @@ systems useful without making them authoritative.
 Session.submit_command(session, proposal.command)
 ```
 
+`Gloam.Agents.plan_npc_movements/2` uses the same pattern for deterministic NPC
+schedules: a Jido action proposes NPC movement from the current time band, then
+the session runtime persists `npc_moved` events if the proposal changes world
+state.
+
 ## Spark Direction
 
 Spark is a good fit for a later Elixir authoring DSL once the extension points

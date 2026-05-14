@@ -28,3 +28,5 @@ Gloam separates pure game rules from runtime effects.
 Jido agents can propose behavior. They do not mutate world state directly.
 Agent proposals are normalized into `Gloam.Commands.Command` structs and then
 sent through the same deterministic session/rules/event path as player commands.
+NPC schedule planning follows the same rule: Jido actions propose movement, and
+Gloam persists replayable events.
