@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://gloam_living_village_main"]
+[gd_scene load_steps=3 format=3 uid="uid://gloam_living_village_main"]
 
 [ext_resource type="Script" path="res://examples/living_village/scripts/main.gd" id="1_main"]
+[ext_resource type="Script" path="res://addons/gloam/scripts/gloam_bindable.gd" id="2_bindable"]
 
 [node name="LivingVillage" type="Node2D"]
 script = ExtResource("1_main")
@@ -30,13 +31,23 @@ offset_top = 164.0
 offset_right = 806.0
 offset_bottom = 244.0
 color = Color(0.478431, 0.172549, 0.109804, 1)
+script = ExtResource("2_bindable")
+gloam_id = "blacksmith"
+gloam_kind = "location"
+interaction_type = "talk"
+display_name = "Blacksmith"
 
-[node name="Shrine" type="ColorRect" parent="."]
+[node name="OldWell" type="ColorRect" parent="."]
 offset_left = 154.0
 offset_top = 310.0
 offset_right = 274.0
 offset_bottom = 390.0
 color = Color(0.164706, 0.376471, 0.447059, 1)
+script = ExtResource("2_bindable")
+gloam_id = "old_well"
+gloam_kind = "location"
+interaction_type = "inspect"
+display_name = "Old Well"
 
 [node name="Player" type="ColorRect" parent="."]
 offset_left = 462.0
@@ -79,7 +90,11 @@ text = "Connecting..."
 layout_mode = 2
 text = "Calendar pending"
 
+[node name="Interaction" type="Label" parent="UI/Panel/Margin/Text"]
+layout_mode = 2
+text = "Move near a place and press E"
+
 [node name="Log" type="Label" parent="UI/Panel/Margin/Text"]
 layout_mode = 2
-text = "1 blacksmith, 2 shrine, 3 wait"
+text = "Arrows/WASD move. E interact. 1 blacksmith, 2 well, 3 wait"
 autowrap_mode = 3

@@ -177,7 +177,7 @@ func _on_snapshot_completed(result: int, response_code: int, _headers: PackedStr
 	session.apply_snapshot(payload.get("snapshot", {}))
 	snapshot_received.emit(session.snapshot)
 
-func _on_command_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray, command_id: String, request: HTTPRequest) -> void:
+func _on_command_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray, request: HTTPRequest, command_id: String) -> void:
 	request.queue_free()
 	var payload: Variant = _decode_body(body)
 
