@@ -68,9 +68,10 @@ defmodule Gloam.MixProject do
   defp deps do
     [
       {:bandit, "~> 1.10"},
+      {:jido, "~> 2.2"},
       {:jason, "~> 1.4"},
       {:plug, "~> 1.19"},
-      {:req, "~> 0.5", only: :test}
+      {:req, "~> 0.5"}
     ]
   end
 

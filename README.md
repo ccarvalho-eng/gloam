@@ -44,9 +44,14 @@ editor workflows. Gloam owns the slower world brain: NPC memory, factions,
 schedules, quests, rumors, seasons, and consequences that continue to make sense
 after a client reconnects.
 
-Jido provides the internal agent runtime. Gloam keeps game authority in
+Jido provides the internal agent primitives. Gloam keeps game authority in
 deterministic rules: agents can propose behavior, but rules validate and events
 record what happened.
+
+In practice, an agent proposal is an ordinary game command suggested by an NPC,
+faction, director, schedule, or future AI model. Gloam runs that proposed command
+through the same rule engine and event log as player commands, so agents can add
+life to the world without bypassing server authority.
 
 ## Engine Adapters
 

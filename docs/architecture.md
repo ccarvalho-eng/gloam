@@ -26,4 +26,5 @@ Gloam separates pure game rules from runtime effects.
 ## Agent Boundary
 
 Jido agents can propose behavior. They do not mutate world state directly.
-Proposals return to the same command/rules boundary used by players.
+Agent proposals are normalized into `Gloam.Commands.Command` structs and then
+sent through the same deterministic session/rules/event path as player commands.

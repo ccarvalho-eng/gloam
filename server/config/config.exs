@@ -9,6 +9,8 @@ config :gloam, :http,
   ip: :loopback,
   port: String.to_integer(System.get_env("GLOAM_PORT") || "4000")
 
+config :tzdata, :autoupdate, :disabled
+
 env_config = "#{config_env()}.exs"
 
 if File.exists?(Path.join(__DIR__, env_config)) do
