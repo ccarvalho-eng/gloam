@@ -30,9 +30,7 @@ defmodule Gloam.Runtime.SessionServerTest do
                travel_command("cmd-1", "session-1", "blacksmith")
              )
 
-    monitor_ref = Process.monitor(first_pid)
-    GenServer.stop(first_pid)
-    assert_receive {:DOWN, ^monitor_ref, :process, ^first_pid, _reason}
+    assert :ok = stop_session(first_pid)
 
     {:ok, resumed_pid} = start_session(storage_path, "session-1")
 
@@ -56,15 +54,15 @@ defmodule Gloam.Runtime.SessionServerTest do
     opts = [content: Content.living_village(), session_id: session_id, storage_path: storage_path]
 
     with {:ok, pid} <- SessionServer.start_link(opts) do
-      on_exit(fn -> stop_if_alive(pid) end)
+      on_exit(fn -> stop_session(pid) end)
       {:ok, pid}
     end
   end
 
-  defp stop_if_alive(pid) do
-    if Process.alive?(pid) do
-      GenServer.stop(pid)
-    end
+  defp stop_session(pid) do
+    GenServer.stop(pid)
+  catch
+    :exit, {:noproc, _call} -> :ok
   end
 
   defp travel_command(id, session_id, target_id) do
