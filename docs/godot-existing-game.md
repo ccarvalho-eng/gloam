@@ -5,7 +5,7 @@ Godot keeps rendering, input, animation, physics, and scene orchestration.
 
 ## Intended Integration
 
-1. Copy `godot/addons/gloam` into your project.
+1. Copy `examples/engines/godot/addons/gloam` into your project.
 2. Enable the plugin.
 3. The plugin adds `GloamClient` as an Autoload singleton.
 4. Configure server URL and auth mode.

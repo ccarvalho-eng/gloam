@@ -37,13 +37,13 @@ mix run --no-halt
 Open the Living Village sample with:
 
 ```bash
-/Applications/Godot.app/Contents/MacOS/Godot --path godot
+/Applications/Godot.app/Contents/MacOS/Godot --path examples/engines/godot
 ```
 
 The intended first-run flow is:
 
 1. Start the Gloam server.
-2. Open the Living Village project in Godot.
+2. Open `examples/engines/godot/project.godot` in Godot.
 3. Run the main scene.
 4. Create a local session.
 5. Submit commands like travel, talk, inspect, and wait.

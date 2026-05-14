@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://gloam_living_village_main"]
 
-[ext_resource type="Script" path="res://examples/living_village/scripts/main.gd" id="1_main"]
+[ext_resource type="Script" path="res://living_village/scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://addons/gloam/scripts/gloam_bindable.gd" id="2_bindable"]
 
 [node name="LivingVillage" type="Node2D"]

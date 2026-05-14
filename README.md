@@ -1,7 +1,6 @@
 # Gloam
 
 [![CI](https://github.com/ccarvalho-eng/gloam/actions/workflows/ci.yml/badge.svg)](https://github.com/ccarvalho-eng/gloam/actions/workflows/ci.yml)
-[![Hex.pm](https://img.shields.io/hexpm/v/gloam.svg)](https://hex.pm/packages/gloam)
 [![Docs](https://img.shields.io/badge/docs-hexdocs-purple.svg)](https://hexdocs.pm/gloam)
 [![License](https://img.shields.io/github/license/ccarvalho-eng/gloam.svg)](LICENSE)
 [![Elixir](https://img.shields.io/badge/elixir-1.19%2B-4B275F.svg)](https://elixir-lang.org)
@@ -34,8 +33,9 @@ mix setup
 mix test
 ```
 
-The Godot addon and Living Village sample live under `godot/`. Other engine
-samples can use the same HTTP protocol and event contracts.
+Engine adapters and runnable samples live under `examples/engines/`. Shared
+world fixtures live under `examples/worlds/`. Future engine samples can sit
+beside Godot and use the same HTTP protocol and event contracts.
 
 ## Why Gloam
 
@@ -59,11 +59,11 @@ the project.
 ## Repository Layout
 
 ```text
-docs/                         user and architecture docs
-server/                       Elixir server and runtime
-godot/addons/gloam/           Godot adapter
-godot/examples/living_village Godot sample project
-examples/living_village_world sample world content
+docs/                                user and architecture docs
+server/                              Elixir server and runtime
+examples/engines/godot/addons/gloam/ Godot adapter
+examples/engines/godot/living_village/ Godot sample project
+examples/worlds/living_village/      sample world content
 ```
 
 ## Documentation
