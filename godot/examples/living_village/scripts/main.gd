@@ -5,6 +5,10 @@ extends Node2D
 @onready var clock_label: Label = $UI/Panel/Margin/Text/Clock
 @onready var log_label: Label = $UI/Panel/Margin/Text/Log
 
+const PLAYER_SPEED := 220.0
+const PLAYER_MIN := Vector2(24, 64)
+const PLAYER_MAX := Vector2(900, 480)
+
 var locations := {
 	"village_square": Vector2(462, 248),
 	"blacksmith": Vector2(730, 184),
@@ -23,6 +27,14 @@ func _ready() -> void:
 	_start_smoke_timeout()
 	_log("Creating a Gloam session...")
 	GloamClient.create_local_session("player")
+
+func _physics_process(delta: float) -> void:
+	var direction := _movement_direction()
+
+	if direction == Vector2.ZERO:
+		return
+
+	player_marker.position = _bounded_position(player_marker.position + direction * PLAYER_SPEED * delta)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed:
@@ -57,7 +69,7 @@ func _on_snapshot_received(snapshot: Dictionary) -> void:
 	var player: Dictionary = snapshot.get("player", {})
 	var calendar: Dictionary = snapshot.get("calendar", {})
 	var location_id: String = player.get("location_id", "village_square")
-	player_marker.position = locations.get(location_id, locations["village_square"])
+	player_marker.position = _bounded_position(locations.get(location_id, locations["village_square"]))
 	clock_label.text = _calendar_text(calendar)
 
 func _on_command_accepted(_command_id: String, events: Array) -> void:
@@ -83,7 +95,30 @@ func _calendar_text(calendar: Dictionary) -> String:
 	]
 
 func _log(message: String) -> void:
-	log_label.text = message + "\n1 blacksmith, 2 shrine, 3 wait"
+	log_label.text = message + "\nArrows/WASD move. 1 blacksmith, 2 shrine, 3 wait"
+
+func _movement_direction() -> Vector2:
+	var direction := Vector2.ZERO
+
+	if Input.is_key_pressed(KEY_LEFT) or Input.is_key_pressed(KEY_A):
+		direction.x -= 1.0
+
+	if Input.is_key_pressed(KEY_RIGHT) or Input.is_key_pressed(KEY_D):
+		direction.x += 1.0
+
+	if Input.is_key_pressed(KEY_UP) or Input.is_key_pressed(KEY_W):
+		direction.y -= 1.0
+
+	if Input.is_key_pressed(KEY_DOWN) or Input.is_key_pressed(KEY_S):
+		direction.y += 1.0
+
+	return direction.normalized()
+
+func _bounded_position(position: Vector2) -> Vector2:
+	return Vector2(
+		clampf(position.x, PLAYER_MIN.x, PLAYER_MAX.x),
+		clampf(position.y, PLAYER_MIN.y, PLAYER_MAX.y)
+	)
 
 func _server_url() -> String:
 	var configured_url := OS.get_environment("GLOAM_SERVER_URL")
