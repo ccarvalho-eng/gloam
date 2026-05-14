@@ -7,6 +7,7 @@ The protocol is JSON over HTTP and WebSocket.
 - `POST /api/sessions`
 - `GET /api/sessions/:id/snapshot`
 - `POST /api/sessions/:id/commands`
+- `POST /api/sessions/:id/ticks`
 - `POST /api/auth/refresh`
 
 ## WebSocket
@@ -39,6 +40,23 @@ Server messages:
 
 Command decoding uses an explicit allowlist for command types and sources. It
 does not convert arbitrary strings into atoms.
+
+## Tick Events
+
+Scheduled ticks and `wait` commands both emit `calendar_advanced` events. Engine
+clients should treat these as authoritative calendar updates and refresh local
+time, schedules, lighting, UI clocks, or seasonal state from the event payload.
+
+Host engines can also advance session time explicitly:
+
+```json
+{
+  "minutes": 5
+}
+```
+
+The tick endpoint requires the same session bearer token and `command:write`
+scope as command submission. Accepted ticks return `calendar_advanced` events.
 
 ## Error
 

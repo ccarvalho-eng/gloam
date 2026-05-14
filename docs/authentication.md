@@ -15,6 +15,7 @@ Gloam uses practical secure defaults without making local development painful.
 3. HTTP requests include `Authorization: Bearer <token>`.
 4. WebSocket connections send the same token in handshake headers.
 5. Commands are accepted only when token session, player, and scope match.
+6. Explicit tick requests require the token session and `command:write` scope.
 
 ## Godot Web Exports
 

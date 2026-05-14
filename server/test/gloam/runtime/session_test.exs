@@ -100,4 +100,21 @@ defmodule Gloam.Runtime.SessionTest do
     assert Session.snapshot(updated).calendar.hour == 7
     assert Session.snapshot(updated).calendar.minute == 30
   end
+
+  test "tick advances calendar time through replayable events" do
+    {:ok, session, _events} = Session.start(Content.living_village(), session_id: "session-1")
+
+    assert {:ok, updated, events} = Session.tick(session, 15)
+
+    assert Enum.map(events, & &1.type) == [:calendar_advanced]
+    assert Session.snapshot(updated).calendar.hour == 6
+    assert Session.snapshot(updated).calendar.minute == 15
+  end
+
+  test "tick rejects invalid minute values without changing state" do
+    {:ok, session, _events} = Session.start(Content.living_village(), session_id: "session-1")
+
+    assert {:error, error, ^session, []} = Session.tick(session, 0)
+    assert error.code == :invalid_tick_duration
+  end
 end

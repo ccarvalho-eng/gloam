@@ -9,6 +9,11 @@ config :gloam, :http,
   ip: :loopback,
   port: String.to_integer(System.get_env("GLOAM_PORT") || "4000")
 
+config :gloam, :ticks,
+  enabled: System.get_env("GLOAM_TICKS_ENABLED") == "true",
+  interval_ms: String.to_integer(System.get_env("GLOAM_TICK_INTERVAL_MS") || "1000"),
+  minutes: String.to_integer(System.get_env("GLOAM_TICK_MINUTES") || "5")
+
 config :tzdata, :autoupdate, :disabled
 
 env_config = "#{config_env()}.exs"

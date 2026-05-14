@@ -9,6 +9,7 @@ defmodule Gloam.Runtime.Session do
   alias Gloam.Commands.Command
   alias Gloam.Events.Event
   alias Gloam.Rules.{Engine, Error}
+  alias Gloam.World.Calendar
 
   @type t :: %__MODULE__{
           id: String.t(),
@@ -52,6 +53,17 @@ defmodule Gloam.Runtime.Session do
       {:ok, session, []}
     else
       plan_command(session, command)
+    end
+  end
+
+  @spec tick(t(), pos_integer()) :: {:ok, t(), [Event.t()]} | {:error, Error.t(), t(), []}
+  def tick(%__MODULE__{} = session, minutes) do
+    with :ok <- validate_tick_minutes(minutes),
+         {:ok, calendar, facts} <- Calendar.advance(session.world.calendar, minutes) do
+      events = [tick_event(session, calendar, facts, minutes)]
+      {:ok, apply_events(session, events), events}
+    else
+      {:error, %Error{} = error} -> {:error, error, session, []}
     end
   end
 
@@ -99,6 +111,30 @@ defmodule Gloam.Runtime.Session do
       |> apply_events([event])
 
     {:error, error, session, [event]}
+  end
+
+  defp validate_tick_minutes(minutes)
+       when is_integer(minutes) and minutes > 0 and minutes <= 1_440,
+       do: :ok
+
+  defp validate_tick_minutes(_minutes) do
+    {:error,
+     Error.new(:invalid_tick_duration, "Tick duration must be between 1 and 1440 minutes")}
+  end
+
+  defp tick_event(session, calendar, facts, minutes) do
+    Event.new!(%{
+      session_id: session.id,
+      type: :calendar_advanced,
+      actor_id: "system",
+      subject_id: session.world.id,
+      correlation_id: tick_correlation_id(),
+      data: %{calendar: calendar, facts: facts, minutes: minutes}
+    })
+  end
+
+  defp tick_correlation_id do
+    "tick-" <> Integer.to_string(System.unique_integer([:positive, :monotonic]))
   end
 
   defp mark_seen(session, command) do

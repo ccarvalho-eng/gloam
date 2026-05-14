@@ -13,6 +13,7 @@ defmodule Gloam.Runtime.SessionServer do
           {:content, map()}
           | {:session_id, String.t()}
           | {:storage_path, String.t()}
+          | {:tick, keyword()}
 
   @spec start_link([option()]) :: GenServer.on_start()
   def start_link(opts) do
@@ -26,6 +27,12 @@ defmodule Gloam.Runtime.SessionServer do
     GenServer.call(server, {:submit_command, command})
   end
 
+  @spec tick(GenServer.server(), pos_integer()) ::
+          {:ok, [struct()]} | {:error, struct(), [struct()]}
+  def tick(server, minutes) do
+    GenServer.call(server, {:tick, minutes})
+  end
+
   @spec snapshot(GenServer.server()) :: map()
   def snapshot(server) do
     GenServer.call(server, :snapshot)
@@ -37,9 +44,12 @@ defmodule Gloam.Runtime.SessionServer do
     session_id = Keyword.fetch!(opts, :session_id)
     storage_path = Keyword.fetch!(opts, :storage_path)
 
+    tick = tick_config(Keyword.get(opts, :tick, []))
+
     with {:ok, session, new_events} <- load_or_start(content, session_id, storage_path),
          :ok <- EventStore.append(storage_path, session_id, new_events) do
-      {:ok, %{session: session, storage_path: storage_path}}
+      state = %{session: session, storage_path: storage_path, tick: tick, tick_timer: nil}
+      {:ok, schedule_tick(state)}
     end
   end
 
@@ -53,15 +63,67 @@ defmodule Gloam.Runtime.SessionServer do
     {:reply, Session.snapshot(state.session), state}
   end
 
-  defp handle_command_result({:ok, session, events}, state) do
+  def handle_call({:tick, minutes}, _from, state) do
+    result = Session.tick(state.session, minutes)
+    handle_tick_result(result, state)
+  end
+
+  @impl true
+  def handle_info({:tick, tick_ref}, %{tick_timer: tick_ref} = state) do
+    result =
+      state.session
+      |> Session.tick(state.tick.minutes)
+      |> persist_tick_result(state)
+
+    handle_scheduled_tick_result(result, state)
+  end
+
+  def handle_info({:tick, _stale_tick_ref}, state) do
+    {:noreply, state}
+  end
+
+  defp handle_tick_result({:ok, session, events}, state) do
+    reply_after_persist(state, session, events, {:ok, events})
+  end
+
+  defp handle_tick_result({:error, error, session, events}, state) do
+    {:reply, {:error, error, events}, %{state | session: session}}
+  end
+
+  defp persist_tick_result({:ok, session, events}, state) do
     with :ok <- persist_events(state.storage_path, session.id, events) do
-      {:reply, {:ok, events}, %{state | session: session}}
+      {:ok, session}
     end
   end
 
+  defp persist_tick_result({:error, error, _session, _events}, _state) do
+    {:error, error}
+  end
+
+  defp handle_scheduled_tick_result({:ok, session}, state) do
+    state =
+      %{state | session: session, tick_timer: nil}
+      |> schedule_tick()
+
+    {:noreply, state}
+  end
+
+  defp handle_scheduled_tick_result({:error, reason}, state) do
+    {:stop, reason, %{state | tick_timer: nil}}
+  end
+
+  defp handle_command_result({:ok, session, events}, state) do
+    reply_after_persist(state, session, events, {:ok, events})
+  end
+
   defp handle_command_result({:error, error, session, events}, state) do
-    with :ok <- persist_events(state.storage_path, session.id, events) do
-      {:reply, {:error, error, events}, %{state | session: session}}
+    reply_after_persist(state, session, events, {:error, error, events})
+  end
+
+  defp reply_after_persist(state, session, events, reply) do
+    case persist_events(state.storage_path, session.id, events) do
+      :ok -> {:reply, reply, %{state | session: session}}
+      {:error, reason} -> {:stop, reason, {:error, reason, []}, state}
     end
   end
 
@@ -86,6 +148,22 @@ defmodule Gloam.Runtime.SessionServer do
       {:ok, session, []}
     end
   end
+
+  defp tick_config(opts) do
+    %{
+      enabled: Keyword.get(opts, :enabled, false),
+      interval_ms: Keyword.get(opts, :interval_ms, 1_000),
+      minutes: Keyword.get(opts, :minutes, 5)
+    }
+  end
+
+  defp schedule_tick(%{tick: %{enabled: true, interval_ms: interval_ms}, tick_timer: nil} = state) do
+    tick_ref = make_ref()
+    Process.send_after(self(), {:tick, tick_ref}, interval_ms)
+    %{state | tick_timer: tick_ref}
+  end
+
+  defp schedule_tick(state), do: state
 
   defp via_tuple(session_id) do
     {:via, Registry, {Gloam.Runtime.Registry, session_id}}

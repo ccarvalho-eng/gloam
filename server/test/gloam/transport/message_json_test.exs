@@ -36,4 +36,24 @@ defmodule Gloam.Transport.MessageJSONTest do
     assert encoded["event"]["correlation_id"] == "cmd-1"
     assert encoded["event"]["data"] == %{"location_id" => "blacksmith"}
   end
+
+  test "encodes calendar structs inside event data" do
+    content = Content.living_village()
+
+    event =
+      Event.new!(%{
+        session_id: "session-1",
+        type: :calendar_advanced,
+        actor_id: "system",
+        subject_id: content.world.id,
+        correlation_id: "tick-1",
+        data: %{calendar: content.world.calendar, facts: [:minute_changed], minutes: 5}
+      })
+
+    encoded = MessageJSON.event(event)
+
+    assert encoded["event"]["data"]["calendar"]["season"] == "emberwake"
+    assert encoded["event"]["data"]["facts"] == ["minute_changed"]
+    assert encoded["event"]["data"]["minutes"] == 5
+  end
 end

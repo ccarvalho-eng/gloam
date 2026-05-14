@@ -50,8 +50,46 @@ defmodule Gloam.Runtime.SessionServerTest do
     assert Enum.map(persisted, & &1.type) == [:session_started, :player_moved]
   end
 
-  defp start_session(storage_path, session_id) do
-    opts = [content: Content.living_village(), session_id: session_id, storage_path: storage_path]
+  test "manual ticks advance and persist session calendar events" do
+    storage_path = tmp_path()
+    {:ok, pid} = start_session(storage_path, "session-1")
+
+    assert {:ok, events} = SessionServer.tick(pid, 20)
+    assert Enum.map(events, & &1.type) == [:calendar_advanced]
+    assert SessionServer.snapshot(pid).calendar.minute == 20
+
+    assert {:ok, persisted} = EventStore.load(storage_path, "session-1")
+    assert Enum.map(persisted, & &1.type) == [:session_started, :calendar_advanced]
+  end
+
+  test "automatic ticks are opt-in and persist through the same event path" do
+    storage_path = tmp_path()
+
+    {:ok, pid} =
+      start_session(storage_path, "session-1", tick: [enabled: true, interval_ms: 10, minutes: 5])
+
+    assert eventually(fn -> SessionServer.snapshot(pid).calendar.minute >= 5 end)
+
+    assert {:ok, persisted} = EventStore.load(storage_path, "session-1")
+    assert Enum.any?(persisted, &(&1.type == :calendar_advanced))
+  end
+
+  test "ignores stale scheduled tick messages" do
+    storage_path = tmp_path()
+    {:ok, pid} = start_session(storage_path, "session-1")
+
+    send(pid, {:tick, make_ref()})
+    Process.sleep(10)
+
+    assert SessionServer.snapshot(pid).calendar.minute == 0
+    assert {:ok, persisted} = EventStore.load(storage_path, "session-1")
+    assert Enum.map(persisted, & &1.type) == [:session_started]
+  end
+
+  defp start_session(storage_path, session_id, extra_opts \\ []) do
+    opts =
+      [content: Content.living_village(), session_id: session_id, storage_path: storage_path] ++
+        extra_opts
 
     with {:ok, pid} <- SessionServer.start_link(opts) do
       on_exit(fn -> stop_session(pid) end)
@@ -86,5 +124,20 @@ defmodule Gloam.Runtime.SessionServerTest do
 
     on_exit(fn -> File.rm_rf(path) end)
     path
+  end
+
+  defp eventually(fun), do: eventually(fun, 20)
+
+  defp eventually(_fun, 0), do: false
+
+  defp eventually(fun, attempts_left) do
+    case fun.() do
+      true ->
+        true
+
+      false ->
+        Process.sleep(10)
+        eventually(fun, attempts_left - 1)
+    end
   end
 end

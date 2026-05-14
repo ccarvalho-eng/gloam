@@ -57,6 +57,8 @@ defmodule Gloam.Transport.MessageJSON do
     }
   end
 
+  defp stringify_value(%Calendar{} = value), do: calendar(value)
+
   defp stringify_value(value) when is_map(value) do
     Map.new(value, fn {key, nested_value} -> {to_string(key), stringify_value(nested_value)} end)
   end

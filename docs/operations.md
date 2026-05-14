@@ -23,5 +23,6 @@ mix precommit
 - Use TLS.
 - Disable `dev_open`.
 - Protect admin routes.
+- Keep automatic ticks disabled unless the game server owns world time.
 - Configure payload and rate limits.
 - Keep logs free of tokens, secrets, prompts, and private player data.

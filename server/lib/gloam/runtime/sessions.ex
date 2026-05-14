@@ -17,7 +17,10 @@ defmodule Gloam.Runtime.Sessions do
   defp start_session(session_id) do
     child_spec = {
       SessionServer,
-      content: Content.living_village(), session_id: session_id, storage_path: storage_path()
+      content: Content.living_village(),
+      session_id: session_id,
+      storage_path: storage_path(),
+      tick: tick_config()
     }
 
     case DynamicSupervisor.start_child(Gloam.Runtime.SessionSupervisor, child_spec) do
@@ -29,5 +32,9 @@ defmodule Gloam.Runtime.Sessions do
 
   defp storage_path do
     Application.get_env(:gloam, :storage_path, "priv/gloam/storage")
+  end
+
+  defp tick_config do
+    Application.get_env(:gloam, :ticks, [])
   end
 end

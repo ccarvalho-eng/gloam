@@ -25,6 +25,10 @@ The server starts a Bandit HTTP listener on `127.0.0.1:4000` by default.
 Set `GLOAM_PORT` before boot when you need a different local port.
 Open `http://127.0.0.1:4000/` in a browser to confirm the API is running.
 
+Automatic world ticks are disabled by default. Set `GLOAM_TICKS_ENABLED=true`
+and configure `GLOAM_TICK_INTERVAL_MS` and `GLOAM_TICK_MINUTES` before boot when
+enabling scheduled session ticks in a host game.
+
 ## Run The Godot Sample
 
 Start the server in one terminal and keep it running:

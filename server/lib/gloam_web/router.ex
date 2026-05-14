@@ -29,6 +29,7 @@ defmodule GloamWeb.Router do
         "create_session" => "POST /api/sessions",
         "snapshot" => "GET /api/sessions/:id/snapshot",
         "command" => "POST /api/sessions/:id/commands",
+        "tick" => "POST /api/sessions/:id/ticks",
         "health" => "GET /health"
       }
     })
@@ -82,6 +83,19 @@ defmodule GloamWeb.Router do
     end
   end
 
+  post "/api/sessions/:session_id/ticks" do
+    with {:ok, claims} <- authenticate(conn),
+         :ok <- authorize_tick_write(claims, session_id),
+         {:ok, minutes} <- tick_minutes(conn.body_params),
+         {:ok, pid} <- Sessions.get_or_start(session_id) do
+      respond_to_tick(conn, SessionServer.tick(pid, minutes))
+    else
+      {:error, %Gloam.Rules.Error{} = error} -> send_tick_error(conn, error)
+      {:error, %Error{} = error} -> send_auth_error(conn, error)
+      {:error, error} -> send_error(conn, 500, error)
+    end
+  end
+
   match _ do
     send_error(conn, 404, %{code: :not_found, message: "Route not found", details: %{}})
   end
@@ -103,6 +117,19 @@ defmodule GloamWeb.Router do
       "error" => error_json(error),
       "events" => Enum.map(events, &MessageJSON.event/1)
     })
+  end
+
+  defp respond_to_tick(conn, {:ok, events}) do
+    conn
+    |> put_status(202)
+    |> json(%{
+      "status" => "accepted",
+      "events" => Enum.map(events, &MessageJSON.event/1)
+    })
+  end
+
+  defp respond_to_tick(conn, {:error, error, _events}) do
+    send_tick_error(conn, error)
   end
 
   defp create_session_attrs(params) do
@@ -160,6 +187,27 @@ defmodule GloamWeb.Router do
     {:error, Error.new(:session_mismatch, "Command session does not match request session")}
   end
 
+  defp authorize_tick_write(%Claims{session_id: session_id} = claims, session_id) do
+    Token.require_scope(claims, :command_write)
+  end
+
+  defp authorize_tick_write(%Claims{}, _session_id) do
+    {:error, Error.new(:session_mismatch, "Token session does not match request session")}
+  end
+
+  defp tick_minutes(%{"minutes" => minutes})
+       when is_integer(minutes) and minutes > 0 and minutes <= 1_440 do
+    {:ok, minutes}
+  end
+
+  defp tick_minutes(_params) do
+    {:error,
+     Gloam.Rules.Error.new(
+       :invalid_tick_duration,
+       "Tick duration must be between 1 and 1440 minutes"
+     )}
+  end
+
   defp mint_session_token(session_id, player_id) do
     Token.mint(%{
       session_id: session_id,
@@ -179,6 +227,10 @@ defmodule GloamWeb.Router do
   end
 
   defp send_create_session_error(conn, error) do
+    send_error(conn, 400, error)
+  end
+
+  defp send_tick_error(conn, error) do
     send_error(conn, 400, error)
   end
 

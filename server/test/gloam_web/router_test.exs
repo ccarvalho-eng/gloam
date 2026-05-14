@@ -48,6 +48,7 @@ defmodule GloamWeb.RouterTest do
              "create_session" => "POST /api/sessions",
              "snapshot" => "GET /api/sessions/:id/snapshot",
              "command" => "POST /api/sessions/:id/commands",
+             "tick" => "POST /api/sessions/:id/ticks",
              "health" => "GET /health"
            }
   end
@@ -137,6 +138,56 @@ defmodule GloamWeb.RouterTest do
 
     assert {:ok, persisted} = EventStore.load(storage_path, created["session_id"])
     assert Enum.map(persisted, & &1.type) == [:session_started, :player_moved]
+  end
+
+  test "submits an authorized tick and persists calendar events", %{storage_path: storage_path} do
+    created = create_session()
+
+    conn =
+      :post
+      |> conn("/api/sessions/#{created["session_id"]}/ticks", Jason.encode!(%{"minutes" => 15}))
+      |> put_req_header("content-type", "application/json")
+      |> put_auth(created["token"])
+      |> Router.call(@opts)
+
+    assert conn.status == 202
+
+    body = Jason.decode!(conn.resp_body)
+
+    assert body["status"] == "accepted"
+    assert body["events"] |> List.first() |> get_in(["event", "type"]) == "calendar_advanced"
+
+    assert {:ok, persisted} = EventStore.load(storage_path, created["session_id"])
+    assert Enum.map(persisted, & &1.type) == [:session_started, :calendar_advanced]
+  end
+
+  test "rejects invalid tick requests" do
+    created = create_session()
+
+    conn =
+      :post
+      |> conn("/api/sessions/#{created["session_id"]}/ticks", Jason.encode!(%{"minutes" => 0}))
+      |> put_req_header("content-type", "application/json")
+      |> put_auth(created["token"])
+      |> Router.call(@opts)
+
+    assert conn.status == 400
+    assert Jason.decode!(conn.resp_body)["error"]["code"] == "invalid_tick_duration"
+  end
+
+  test "rejects tick requests for a different session" do
+    created = create_session()
+    other = create_session()
+
+    conn =
+      :post
+      |> conn("/api/sessions/#{other["session_id"]}/ticks", Jason.encode!(%{"minutes" => 15}))
+      |> put_req_header("content-type", "application/json")
+      |> put_auth(created["token"])
+      |> Router.call(@opts)
+
+    assert conn.status == 403
+    assert Jason.decode!(conn.resp_body)["error"]["code"] == "session_mismatch"
   end
 
   test "rejects command requests for a different session" do
