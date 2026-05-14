@@ -1,5 +1,13 @@
 # Gloam
 
+[![CI](https://github.com/ccarvalho-eng/gloam/actions/workflows/ci.yml/badge.svg)](https://github.com/ccarvalho-eng/gloam/actions/workflows/ci.yml)
+[![Hex.pm](https://img.shields.io/hexpm/v/gloam.svg)](https://hex.pm/packages/gloam)
+[![Docs](https://img.shields.io/badge/docs-hexdocs-purple.svg)](https://hexdocs.pm/gloam)
+[![License](https://img.shields.io/github/license/ccarvalho-eng/gloam.svg)](LICENSE)
+[![Elixir](https://img.shields.io/badge/elixir-1.17%2B-4B275F.svg)](https://elixir-lang.org)
+[![Godot](https://img.shields.io/badge/godot-4.x-478CBF.svg)](https://godotengine.org)
+[![Jido](https://img.shields.io/badge/powered%20by-Jido-2F6FED.svg)](https://github.com/agentjido/jido)
+
 Gloam is a Jido-powered living-world server for Godot games with persistent
 NPCs, factions, memory, seasons, and consequences.
 

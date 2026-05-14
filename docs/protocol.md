@@ -37,6 +37,9 @@ Server messages:
 }
 ```
 
+Command decoding uses an explicit allowlist for command types and sources. It
+does not convert arbitrary strings into atoms.
+
 ## Error
 
 ```json

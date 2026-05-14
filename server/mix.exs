@@ -8,6 +8,7 @@ defmodule Gloam.MixProject do
       elixir: "~> 1.17",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
+      consolidate_protocols: Mix.env() == :prod,
       description: description(),
       package: package(),
       docs: docs(),
@@ -65,7 +66,9 @@ defmodule Gloam.MixProject do
   end
 
   defp deps do
-    []
+    [
+      {:jason, "~> 1.4"}
+    ]
   end
 
   defp aliases do
