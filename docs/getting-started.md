@@ -2,8 +2,15 @@
 
 ## Requirements
 
-- Elixir and Erlang/OTP
+- asdf with Erlang/OTP `28.4.1` and Elixir `1.19.5-otp-28`
 - Godot 4.x
+
+The repository includes a root `.tool-versions` file. From the repository root,
+install the pinned BEAM toolchain with:
+
+```bash
+asdf install
+```
 
 ## Run The Server
 
