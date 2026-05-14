@@ -14,7 +14,8 @@ mix test
 mix run --no-halt
 ```
 
-The HTTP and WebSocket surfaces will be added after the core runtime slice.
+The server starts a Bandit HTTP listener on `127.0.0.1:4000` by default.
+Set `GLOAM_PORT` before boot when you need a different local port.
 
 ## Run The Godot Sample
 

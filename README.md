@@ -4,7 +4,7 @@
 [![Hex.pm](https://img.shields.io/hexpm/v/gloam.svg)](https://hex.pm/packages/gloam)
 [![Docs](https://img.shields.io/badge/docs-hexdocs-purple.svg)](https://hexdocs.pm/gloam)
 [![License](https://img.shields.io/github/license/ccarvalho-eng/gloam.svg)](LICENSE)
-[![Elixir](https://img.shields.io/badge/elixir-1.17%2B-4B275F.svg)](https://elixir-lang.org)
+[![Elixir](https://img.shields.io/badge/elixir-1.19%2B-4B275F.svg)](https://elixir-lang.org)
 [![Godot](https://img.shields.io/badge/godot-4.x-478CBF.svg)](https://godotengine.org)
 [![Jido](https://img.shields.io/badge/powered%20by-Jido-2F6FED.svg)](https://github.com/agentjido/jido)
 
@@ -20,6 +20,7 @@ Godot addon that existing projects can plug into.
 Gloam is being built server-first. The current foundation includes:
 
 - a Mix server project under `server/`
+- a supervised Bandit HTTP API for Godot clients
 - pure calendar and session domain modules
 - tests for time rollover, command validation, rejection, idempotency, and event folding
 - documentation for setup, architecture, protocol, and Godot integration

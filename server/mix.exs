@@ -5,7 +5,7 @@ defmodule Gloam.MixProject do
     [
       app: :gloam,
       version: "0.1.0",
-      elixir: "~> 1.17",
+      elixir: "~> 1.19",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       consolidate_protocols: Mix.env() == :prod,
@@ -67,7 +67,10 @@ defmodule Gloam.MixProject do
 
   defp deps do
     [
-      {:jason, "~> 1.4"}
+      {:bandit, "~> 1.10"},
+      {:jason, "~> 1.4"},
+      {:plug, "~> 1.19"},
+      {:req, "~> 0.5", only: :test}
     ]
   end
 
