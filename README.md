@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="300" alt="gloam" src="https://github.com/user-attachments/assets/1243c391-692d-497b-9ba1-d3a06910185e" />
+  <img width="280" alt="gloam" src="https://github.com/user-attachments/assets/1243c391-692d-497b-9ba1-d3a06910185e" />
   
   [![CI](https://github.com/ccarvalho-eng/gloam/actions/workflows/ci.yml/badge.svg)](https://github.com/ccarvalho-eng/gloam/actions/workflows/ci.yml)
   [![License](https://img.shields.io/github/license/ccarvalho-eng/gloam.svg)](LICENSE)
