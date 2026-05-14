@@ -64,7 +64,9 @@ func _on_command_accepted(_command_id: String, events: Array) -> void:
     _log("Server accepted command with " + str(events.size()) + " event(s).")
 
 func _on_command_rejected(_command_id: String, error: Dictionary) -> void:
-    _log("Rejected: " + str(error.get("code", "unknown")))
+    var code: String = str(error.get("code", "unknown"))
+    var message: String = str(error.get("message", ""))
+    _log("Rejected: " + code + "\n" + message)
     _finish_smoke(1)
 
 func _on_resync_required() -> void:

@@ -28,7 +28,7 @@ func create_local_session(player_id: String) -> void:
 
     if error != OK:
         request.queue_free()
-        command_rejected.emit("", {"code": "session_create_failed", "message": str(error)})
+        command_rejected.emit("", {"code": "session_create_failed", "message": "Could not start HTTP request: " + str(error)})
 
 func refresh_snapshot() -> void:
     if session.session_id == "" or session.token == "":
@@ -149,12 +149,16 @@ func _post_json(request: HTTPRequest, path: String, payload: Dictionary, extra_h
 
     return request.request(_http_url(path), headers, HTTPClient.METHOD_POST, JSON.stringify(payload))
 
-func _on_create_session_completed(_result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray, request: HTTPRequest) -> void:
+func _on_create_session_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray, request: HTTPRequest) -> void:
     request.queue_free()
     var payload: Variant = _decode_body(body)
 
+    if result != HTTPRequest.RESULT_SUCCESS:
+        command_rejected.emit("", _http_error("session_create_failed", result, response_code))
+        return
+
     if not _successful(response_code) or not payload is Dictionary:
-        command_rejected.emit("", {"code": "session_create_failed", "message": "Could not create session"})
+        command_rejected.emit("", _http_error("session_create_failed", result, response_code))
         return
 
     session.configure(payload.get("session_id", ""), payload.get("token", ""))
@@ -162,20 +166,24 @@ func _on_create_session_completed(_result: int, response_code: int, _headers: Pa
     authenticated.emit()
     snapshot_received.emit(session.snapshot)
 
-func _on_snapshot_completed(_result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray, request: HTTPRequest) -> void:
+func _on_snapshot_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray, request: HTTPRequest) -> void:
     request.queue_free()
     var payload: Variant = _decode_body(body)
 
-    if not _successful(response_code) or not payload is Dictionary:
+    if result != HTTPRequest.RESULT_SUCCESS or not _successful(response_code) or not payload is Dictionary:
         resync_required.emit()
         return
 
     session.apply_snapshot(payload.get("snapshot", {}))
     snapshot_received.emit(session.snapshot)
 
-func _on_command_completed(_result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray, command_id: String, request: HTTPRequest) -> void:
+func _on_command_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray, command_id: String, request: HTTPRequest) -> void:
     request.queue_free()
     var payload: Variant = _decode_body(body)
+
+    if result != HTTPRequest.RESULT_SUCCESS:
+        command_rejected.emit(command_id, _http_error("command_request_failed", result, response_code))
+        return
 
     if not payload is Dictionary:
         command_rejected.emit(command_id, {"code": "invalid_response", "message": "Server response was invalid"})
@@ -197,6 +205,12 @@ func _successful(response_code: int) -> bool:
 
 func _http_url(path: String) -> String:
     return server_url + path
+
+func _http_error(code: String, result: int, response_code: int) -> Dictionary:
+    return {
+        "code": code,
+        "message": "Could not reach " + server_url + " (result " + str(result) + ", HTTP " + str(response_code) + ")"
+    }
 
 func _websocket_url(path: String) -> String:
     if server_url.begins_with("https://"):

@@ -19,6 +19,13 @@ Set `GLOAM_PORT` before boot when you need a different local port.
 
 ## Run The Godot Sample
 
+Start the server in one terminal and keep it running:
+
+```bash
+cd server
+mix run --no-halt
+```
+
 Open the Living Village sample with:
 
 ```bash
