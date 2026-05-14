@@ -19,10 +19,10 @@ Set `GLOAM_PORT` before boot when you need a different local port.
 
 ## Run The Godot Sample
 
-The Living Village sample will be added under:
+Open the Living Village sample with:
 
-```text
-godot/examples/living_village/
+```bash
+/Applications/Godot.app/Contents/MacOS/Godot --path godot
 ```
 
 The intended first-run flow is:

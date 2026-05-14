@@ -4,6 +4,7 @@
 
 server/_build/
 server/deps/
+godot/.godot/
 
 .DS_Store
 

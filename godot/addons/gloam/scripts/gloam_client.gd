@@ -22,9 +22,26 @@ func configure(new_server_url: String) -> void:
     server_url = new_server_url.rstrip("/")
 
 func create_local_session(player_id: String) -> void:
-    # HTTP session creation lands with the server transport slice.
-    session.configure("local-" + player_id, "")
-    authenticated.emit()
+    var payload := {"player_id": player_id}
+    var request := _new_http_request(_on_create_session_completed)
+    var error := _post_json(request, "/api/sessions", payload, PackedStringArray())
+
+    if error != OK:
+        request.queue_free()
+        command_rejected.emit("", {"code": "session_create_failed", "message": str(error)})
+
+func refresh_snapshot() -> void:
+    if session.session_id == "" or session.token == "":
+        resync_required.emit()
+        return
+
+    var headers := PackedStringArray(["Authorization: Bearer " + session.token])
+    var request := _new_http_request(_on_snapshot_completed)
+    var error := request.request(_http_url("/api/sessions/" + session.session_id + "/snapshot"), headers, HTTPClient.METHOD_GET)
+
+    if error != OK:
+        request.queue_free()
+        resync_required.emit()
 
 func connect_events() -> int:
     if session.session_id == "":
@@ -55,12 +72,15 @@ func submit_command(command_type: String, target_id, params: Dictionary = {}) ->
         params
     )
 
-    if websocket.get_ready_state() != WebSocketPeer.STATE_OPEN:
-        return {"ok": false, "command_id": command_id, "error": "websocket_not_open"}
+    if session.token == "":
+        return {"ok": false, "command_id": command_id, "error": "missing_token"}
 
-    var error := websocket.send_text(JSON.stringify(command))
+    var headers := PackedStringArray(["Authorization: Bearer " + session.token])
+    var request := _new_http_request(_on_command_completed.bind(command_id))
+    var error := _post_json(request, "/api/sessions/" + session.session_id + "/commands", command, headers)
 
     if error != OK:
+        request.queue_free()
         return {"ok": false, "command_id": command_id, "error": "send_failed"}
 
     return {"ok": true, "command_id": command_id}
@@ -114,6 +134,69 @@ func _handle_socket_state() -> void:
         websocket_active = false
         websocket_connected = false
         connection_lost.emit()
+
+func _new_http_request(callback: Callable) -> HTTPRequest:
+    var request := HTTPRequest.new()
+    add_child(request)
+    request.request_completed.connect(callback.bind(request))
+    return request
+
+func _post_json(request: HTTPRequest, path: String, payload: Dictionary, extra_headers: PackedStringArray) -> int:
+    var headers := PackedStringArray(["Content-Type: application/json"])
+
+    for header in extra_headers:
+        headers.append(header)
+
+    return request.request(_http_url(path), headers, HTTPClient.METHOD_POST, JSON.stringify(payload))
+
+func _on_create_session_completed(_result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray, request: HTTPRequest) -> void:
+    request.queue_free()
+    var payload: Variant = _decode_body(body)
+
+    if not _successful(response_code) or not payload is Dictionary:
+        command_rejected.emit("", {"code": "session_create_failed", "message": "Could not create session"})
+        return
+
+    session.configure(payload.get("session_id", ""), payload.get("token", ""))
+    session.apply_snapshot(payload.get("snapshot", {}))
+    authenticated.emit()
+    snapshot_received.emit(session.snapshot)
+
+func _on_snapshot_completed(_result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray, request: HTTPRequest) -> void:
+    request.queue_free()
+    var payload: Variant = _decode_body(body)
+
+    if not _successful(response_code) or not payload is Dictionary:
+        resync_required.emit()
+        return
+
+    session.apply_snapshot(payload.get("snapshot", {}))
+    snapshot_received.emit(session.snapshot)
+
+func _on_command_completed(_result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray, command_id: String, request: HTTPRequest) -> void:
+    request.queue_free()
+    var payload: Variant = _decode_body(body)
+
+    if not payload is Dictionary:
+        command_rejected.emit(command_id, {"code": "invalid_response", "message": "Server response was invalid"})
+        return
+
+    if _successful(response_code):
+        command_accepted.emit(command_id, payload.get("events", []))
+        refresh_snapshot()
+        return
+
+    command_rejected.emit(command_id, payload.get("error", {}))
+
+func _decode_body(body: PackedByteArray) -> Variant:
+    var text := body.get_string_from_utf8()
+    return JSON.parse_string(text)
+
+func _successful(response_code: int) -> bool:
+    return response_code >= 200 and response_code < 300
+
+func _http_url(path: String) -> String:
+    return server_url + path
 
 func _websocket_url(path: String) -> String:
     if server_url.begins_with("https://"):

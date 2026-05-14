@@ -1,0 +1,85 @@
+[gd_scene load_steps=2 format=3 uid="uid://gloam_living_village_main"]
+
+[ext_resource type="Script" path="res://examples/living_village/scripts/main.gd" id="1_main"]
+
+[node name="LivingVillage" type="Node2D"]
+script = ExtResource("1_main")
+
+[node name="Ground" type="ColorRect" parent="."]
+offset_right = 960.0
+offset_bottom = 540.0
+color = Color(0.0784314, 0.101961, 0.0901961, 1)
+
+[node name="Road" type="ColorRect" parent="."]
+offset_left = 120.0
+offset_top = 252.0
+offset_right = 840.0
+offset_bottom = 292.0
+color = Color(0.286275, 0.254902, 0.207843, 1)
+
+[node name="Square" type="ColorRect" parent="."]
+offset_left = 404.0
+offset_top = 184.0
+offset_right = 556.0
+offset_bottom = 336.0
+color = Color(0.360784, 0.313725, 0.25098, 1)
+
+[node name="Blacksmith" type="ColorRect" parent="."]
+offset_left = 686.0
+offset_top = 164.0
+offset_right = 806.0
+offset_bottom = 244.0
+color = Color(0.478431, 0.172549, 0.109804, 1)
+
+[node name="Shrine" type="ColorRect" parent="."]
+offset_left = 154.0
+offset_top = 310.0
+offset_right = 274.0
+offset_bottom = 390.0
+color = Color(0.164706, 0.376471, 0.447059, 1)
+
+[node name="Player" type="ColorRect" parent="."]
+offset_left = 462.0
+offset_top = 248.0
+offset_right = 498.0
+offset_bottom = 284.0
+color = Color(0.964706, 0.737255, 0.247059, 1)
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Panel" type="PanelContainer" parent="UI"]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 420.0
+offset_bottom = 220.0
+
+[node name="Margin" type="MarginContainer" parent="UI/Panel"]
+offset_right = 396.0
+offset_bottom = 196.0
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Text" type="VBoxContainer" parent="UI/Panel/Margin"]
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 384.0
+offset_bottom = 184.0
+
+[node name="Title" type="Label" parent="UI/Panel/Margin/Text"]
+layout_mode = 2
+text = "Gloam Living Village"
+
+[node name="Status" type="Label" parent="UI/Panel/Margin/Text"]
+layout_mode = 2
+text = "Connecting..."
+
+[node name="Clock" type="Label" parent="UI/Panel/Margin/Text"]
+layout_mode = 2
+text = "Calendar pending"
+
+[node name="Log" type="Label" parent="UI/Panel/Margin/Text"]
+layout_mode = 2
+text = "1 blacksmith, 2 shrine, 3 wait"
+autowrap_mode = 3

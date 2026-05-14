@@ -1,0 +1,20 @@
+; Engine configuration file.
+; Edit with care when changing paths used by headless smoke tests.
+
+config_version=5
+
+[application]
+
+config/name="Gloam Living Village"
+run/main_scene="res://examples/living_village/scenes/main.tscn"
+config/features=PackedStringArray("4.6")
+config/icon="res://icon.svg"
+
+[autoload]
+
+GloamClient="*res://addons/gloam/scripts/gloam_client.gd"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
