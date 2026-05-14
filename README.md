@@ -1,10 +1,12 @@
-# Gloam
-
-[![CI](https://github.com/ccarvalho-eng/gloam/actions/workflows/ci.yml/badge.svg)](https://github.com/ccarvalho-eng/gloam/actions/workflows/ci.yml)
-[![License](https://img.shields.io/github/license/ccarvalho-eng/gloam.svg)](LICENSE)
-[![Elixir](https://img.shields.io/badge/elixir-1.19%2B-4B275F.svg)](https://elixir-lang.org)
-[![Godot](https://img.shields.io/badge/godot-4.x-478CBF.svg)](https://godotengine.org)
-[![Jido](https://img.shields.io/badge/powered%20by-Jido-2F6FED.svg)](https://github.com/agentjido/jido)
+<div align="center">
+  <img width="300" alt="gloam" src="https://github.com/user-attachments/assets/1243c391-692d-497b-9ba1-d3a06910185e" />
+  
+  [![CI](https://github.com/ccarvalho-eng/gloam/actions/workflows/ci.yml/badge.svg)](https://github.com/ccarvalho-eng/gloam/actions/workflows/ci.yml)
+  [![License](https://img.shields.io/github/license/ccarvalho-eng/gloam.svg)](LICENSE)
+  [![Elixir](https://img.shields.io/badge/elixir-1.19%2B-4B275F.svg)](https://elixir-lang.org)
+  [![Godot](https://img.shields.io/badge/godot-4.x-478CBF.svg)](https://godotengine.org)
+  [![Jido](https://img.shields.io/badge/powered%20by-Jido-2F6FED.svg)](https://github.com/agentjido/jido)
+</div>
 
 Gloam is an agentic game server for living worlds, built with Jido and designed
 for any engine. It gives games persistent NPCs, factions, memory, seasons, and
