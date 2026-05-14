@@ -1,6 +1,6 @@
 defmodule Gloam.Transport.CommandJSON do
   @moduledoc """
-  JSON-safe command encoding and decoding for Godot clients.
+  JSON-safe command encoding and decoding for game clients.
   """
 
   alias Gloam.Commands.Command

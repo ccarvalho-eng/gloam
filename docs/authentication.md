@@ -10,7 +10,7 @@ Gloam uses practical secure defaults without making local development painful.
 
 ## Session Token Flow
 
-1. Godot creates or resumes a session.
+1. A game client creates or resumes a session.
 2. The server returns a short-lived bearer token.
 3. HTTP requests include `Authorization: Bearer <token>`.
 4. WebSocket connections send the same token in handshake headers.
@@ -32,7 +32,7 @@ cookie or a short-lived WebSocket ticket endpoint when that transport lands.
 
 ## Rules
 
-- Do not embed production secrets in Godot.
+- Do not embed production secrets in game clients.
 - Use TLS outside local development.
 - Reject actor/session mismatches before rules run.
 - Never log bearer tokens.

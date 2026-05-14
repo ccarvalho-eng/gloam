@@ -1,6 +1,6 @@
 # Extensibility
 
-Gloam should stay easy to plug into existing Godot games before it grows a DSL.
+Gloam should stay easy to plug into existing games before it grows a DSL.
 
 ## V1 Approach
 

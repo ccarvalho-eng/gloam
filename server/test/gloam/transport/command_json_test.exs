@@ -4,7 +4,7 @@ defmodule Gloam.Transport.CommandJSONTest do
   alias Gloam.Commands.Command
   alias Gloam.Transport.CommandJSON
 
-  test "decodes a Godot command payload into a domain command" do
+  test "decodes a game-client command payload into a domain command" do
     payload = %{
       "id" => "cmd-1",
       "session_id" => "session-1",

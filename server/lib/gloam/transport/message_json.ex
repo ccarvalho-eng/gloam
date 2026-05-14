@@ -1,6 +1,6 @@
 defmodule Gloam.Transport.MessageJSON do
   @moduledoc """
-  JSON-safe outbound messages for Godot clients.
+  JSON-safe outbound messages for game clients.
   """
 
   alias Gloam.Events.Event

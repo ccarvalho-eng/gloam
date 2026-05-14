@@ -3,7 +3,7 @@
 ## Requirements
 
 - asdf with Erlang/OTP `28.4.1` and Elixir `1.19.5-otp-28`
-- Godot 4.x
+- Godot 4.x for the included sample adapter
 
 The repository includes a root `.tool-versions` file. From the repository root,
 install the pinned BEAM toolchain with:
@@ -58,4 +58,4 @@ cd server
 mix precommit
 ```
 
-When the Godot sample lands, run it after every server protocol change.
+Run at least one engine sample after every server protocol change.

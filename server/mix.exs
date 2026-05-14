@@ -34,7 +34,7 @@ defmodule Gloam.MixProject do
   defp elixirc_paths(_env), do: ["lib"]
 
   defp description do
-    "Jido-powered living-world server for Godot games."
+    "Agentic game server for living worlds, built with Jido."
   end
 
   defp package do

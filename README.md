@@ -8,22 +8,23 @@
 [![Godot](https://img.shields.io/badge/godot-4.x-478CBF.svg)](https://godotengine.org)
 [![Jido](https://img.shields.io/badge/powered%20by-Jido-2F6FED.svg)](https://github.com/agentjido/jido)
 
-Gloam is a Jido-powered living-world server for Godot games with persistent
-NPCs, factions, memory, seasons, and consequences.
+Gloam is an agentic game server for living worlds, built with Jido and designed
+for any engine. It gives games persistent NPCs, factions, memory, seasons, and
+consequences.
 
 The first release focuses on a small but solid foundation: deterministic RPG
-rules, replayable events, a fictional calendar, secure session tokens, and a
-Godot addon that existing projects can plug into.
+rules, replayable events, a fictional calendar, secure session tokens, and
+client adapters that existing projects can plug into.
 
 ## Status
 
 Gloam is being built server-first. The current foundation includes:
 
 - a Mix server project under `server/`
-- a supervised Bandit HTTP API for Godot clients
+- a supervised Bandit HTTP API for game clients
 - pure calendar and session domain modules
 - tests for time rollover, command validation, rejection, idempotency, and event folding
-- documentation for setup, architecture, protocol, and Godot integration
+- documentation for setup, architecture, protocol, and engine integration
 
 ## Quick Start
 
@@ -33,24 +34,34 @@ mix setup
 mix test
 ```
 
-The Godot addon and Living Village sample will live under `godot/`.
+The Godot addon and Living Village sample live under `godot/`. Other engine
+samples can use the same HTTP protocol and event contracts.
 
 ## Why Gloam
 
-Godot is excellent at scenes, input, animation, physics, and rendering. Gloam
-owns the slower world brain: NPC memory, factions, schedules, quests, rumors,
-seasons, and consequences that continue to make sense after a client reconnects.
+Game engines are excellent at scenes, input, animation, physics, rendering, and
+editor workflows. Gloam owns the slower world brain: NPC memory, factions,
+schedules, quests, rumors, seasons, and consequences that continue to make sense
+after a client reconnects.
 
 Jido provides the internal agent runtime. Gloam keeps game authority in
 deterministic rules: agents can propose behavior, but rules validate and events
 record what happened.
+
+## Engine Adapters
+
+Gloam speaks JSON over HTTP today and keeps its protocol engine-neutral. A Unity,
+Unreal, Godot, Phaser, Defold, terminal, or custom client should all map the same
+basic ideas: create a session, send commands, read snapshots, and react to
+events. The checked-in Godot adapter is the first sample, not the boundary of
+the project.
 
 ## Repository Layout
 
 ```text
 docs/                         user and architecture docs
 server/                       Elixir server and runtime
-godot/addons/gloam/           Godot addon
+godot/addons/gloam/           Godot adapter
 godot/examples/living_village Godot sample project
 examples/living_village_world sample world content
 ```

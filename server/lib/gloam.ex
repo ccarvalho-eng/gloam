@@ -1,5 +1,5 @@
 defmodule Gloam do
   @moduledoc """
-  Gloam is a Jido-powered living-world server for Godot games.
+  Gloam is an agentic game server for living worlds, built with Jido.
   """
 end
