@@ -82,5 +82,6 @@ examples/worlds/living_village/      sample world content
 - [Calendar](docs/calendar.md)
 - [RPG primitives](docs/rpg-primitives.md)
 - [Extensibility](docs/extensibility.md)
+- [Next steps](docs/next-steps.md)
 - [Architecture](docs/architecture.md)
 - [Operations](docs/operations.md)
