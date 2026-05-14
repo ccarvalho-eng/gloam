@@ -23,6 +23,7 @@ mix run --no-halt
 
 The server starts a Bandit HTTP listener on `127.0.0.1:4000` by default.
 Set `GLOAM_PORT` before boot when you need a different local port.
+Open `http://127.0.0.1:4000/` in a browser to confirm the API is running.
 
 ## Run The Godot Sample
 

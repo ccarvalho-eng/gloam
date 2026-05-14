@@ -31,6 +31,37 @@ defmodule GloamWeb.RouterTest do
     %{storage_path: storage_path}
   end
 
+  test "returns API discovery metadata at the root" do
+    conn =
+      :get
+      |> conn("/")
+      |> Router.call(@opts)
+
+    assert conn.status == 200
+
+    body = Jason.decode!(conn.resp_body)
+
+    assert body["name"] == "Gloam"
+    assert body["status"] == "ok"
+
+    assert body["endpoints"] == %{
+             "create_session" => "POST /api/sessions",
+             "snapshot" => "GET /api/sessions/:id/snapshot",
+             "command" => "POST /api/sessions/:id/commands",
+             "health" => "GET /health"
+           }
+  end
+
+  test "returns health status" do
+    conn =
+      :get
+      |> conn("/health")
+      |> Router.call(@opts)
+
+    assert conn.status == 200
+    assert Jason.decode!(conn.resp_body) == %{"status" => "ok"}
+  end
+
   test "creates a session with a bearer token and snapshot" do
     conn =
       :post

@@ -21,6 +21,23 @@ defmodule GloamWeb.Router do
   plug(:match)
   plug(:dispatch)
 
+  get "/" do
+    json(conn, %{
+      "name" => "Gloam",
+      "status" => "ok",
+      "endpoints" => %{
+        "create_session" => "POST /api/sessions",
+        "snapshot" => "GET /api/sessions/:id/snapshot",
+        "command" => "POST /api/sessions/:id/commands",
+        "health" => "GET /health"
+      }
+    })
+  end
+
+  get "/health" do
+    json(conn, %{"status" => "ok"})
+  end
+
   post "/api/sessions" do
     with {:ok, attrs} <- create_session_attrs(conn.body_params),
          {:ok, pid} <- Sessions.get_or_start(attrs.session_id),
