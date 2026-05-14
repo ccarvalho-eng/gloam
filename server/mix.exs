@@ -57,6 +57,7 @@ defmodule Gloam.MixProject do
         "../docs/protocol.md",
         "../docs/calendar.md",
         "../docs/rpg-primitives.md",
+        "../docs/extensibility.md",
         "../docs/architecture.md",
         "../docs/operations.md"
       ]

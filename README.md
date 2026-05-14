@@ -55,5 +55,6 @@ examples/living_village_world sample world content
 - [Protocol](docs/protocol.md)
 - [Calendar](docs/calendar.md)
 - [RPG primitives](docs/rpg-primitives.md)
+- [Extensibility](docs/extensibility.md)
 - [Architecture](docs/architecture.md)
 - [Operations](docs/operations.md)

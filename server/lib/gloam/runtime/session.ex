@@ -39,6 +39,12 @@ defmodule Gloam.Runtime.Session do
     {:ok, updated, [event]}
   end
 
+  @spec replay(map(), String.t(), [Event.t()]) :: {:ok, t()}
+  def replay(%{world: world, player: player}, session_id, events) when is_binary(session_id) do
+    session = %__MODULE__{id: session_id, world: world, player: player}
+    {:ok, apply_events(session, events)}
+  end
+
   @spec submit_command(t(), Command.t()) ::
           {:ok, t(), [Event.t()]} | {:error, Error.t(), t(), [Event.t()]}
   def submit_command(%__MODULE__{} = session, %Command{} = command) do
