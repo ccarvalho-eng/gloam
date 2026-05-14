@@ -16,6 +16,13 @@ Gloam uses practical secure defaults without making local development painful.
 4. WebSocket connections send the same token in handshake headers.
 5. Commands are accepted only when token session, player, and scope match.
 
+## Godot Web Exports
+
+Godot's `WebSocketPeer.handshake_headers` are not supported in Web exports
+because browsers restrict custom WebSocket handshake headers. Native Godot
+clients can use bearer headers. Browser exports should use a host-game session
+cookie or a short-lived WebSocket ticket endpoint when that transport lands.
+
 ## Scopes
 
 - `session:read`

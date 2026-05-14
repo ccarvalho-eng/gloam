@@ -80,6 +80,13 @@ defmodule Gloam.Runtime.SessionServerTest do
   end
 
   defp tmp_path do
-    Path.join(System.tmp_dir!(), "gloam-session-server-#{System.unique_integer([:positive])}")
+    path =
+      Path.join(
+        System.tmp_dir!(),
+        "gloam-session-server-#{System.os_time(:nanosecond)}-#{System.unique_integer([:positive])}"
+      )
+
+    on_exit(fn -> File.rm_rf(path) end)
+    path
   end
 end
